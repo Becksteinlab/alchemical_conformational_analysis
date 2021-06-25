@@ -1,0 +1,15 @@
+# ff=oplsaa
+ff=cgenff
+# ff=ligpargen
+
+cd /gem/iorga/repositories/2020-SAMPL7-PhysProp/03_logP_mdpow/sims/_dih_analysis
+
+for i in `ls -1d /gem/iorga/repositories/2020-SAMPL7-PhysProp/03_logP_mdpow/sims/$ff/SM46/SM46/FEP/*/*/* | grep -v 'extended'`; do
+
+  # echo $i
+  j=`echo $i | tr '/' '-' | sed 's/.*sims-//g' | sed 's/SM46-SM46-FEP/SM46/g'`
+  echo $j
+  gmx angle -type dihedral -f $i/md.xtc -n $ff-dih1.ndx -od $j-dih1-dist.xvg -ov $j-dih1-ts.xvg
+  gmx angle -type dihedral -f $i/md.xtc -n $ff-dih2.ndx -od $j-dih2-dist.xvg -ov $j-dih2-ts.xvg
+
+done
