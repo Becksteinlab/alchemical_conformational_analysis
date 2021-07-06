@@ -146,14 +146,12 @@ def extract(datafiles, start=None, stop=None, step=None, padding=45):
        Long-form DataFrame where each row corresponds to a single dihedral measurement
        in column *angle*;
        ``columns=["solvent", "interaction", "lambda", "dihedral", "angle"]``
-
-
     """
     dataframes = []
-    # get each row as a df
     for i in tqdm.tqdm(range(len(datafiles))):
+        # get each row as a df for easier processing
         simulation = datafiles[i:i+1]
-        a = periodic_angle(read_xvg(simulation.iloc[0].filename).iloc[start:stop:step], padding=padding)
+        a = extract_single(simulation.iloc[0].filename, start=start, stop=stop ,stpe=step, padding=padding)
         identifiers = simulation.drop(columns=["molid", "forcefield", "filename"])
         df = pd.concat(
                [pd.concat(len(a)*[identifiers], axis="index")
@@ -162,6 +160,10 @@ def extract(datafiles, start=None, stop=None, step=None, padding=45):
     return pd.concat(dataframes)
 
 
+def extract_single(p, padding=45, start=None, stop=None, step=None):
+    """Extract single data file `p` with periodic padding as angle Series"""
+    a = periodic_angle(read_xvg(p).iloc[start:stop:step], padding=padding)
+    return a
 
 def dihedral_violins(df, width=0.9):
     """Plot distributions of all dihedrals as violin plots.
