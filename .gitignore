@@ -1,5 +1,7 @@
 *~
 .ipynb_checkpoints/
+__pycache__
+.DS_Store
 _dih_analysis/
 _dih_analysis.tgz
 _dih_gaff/
