@@ -43,16 +43,9 @@ def get_metadata(filename):
            molid, forcefield, solvent, interaction, lambda, dihnumber
 
 
-    Example
-    -------
-    Use to build a dataframe of all files::
-
-       datafiles = pd.DataFrame([get_metadata(fn) for fn in
-                                 itertools.chain(*(d.glob("*-ts.xvg*") for d in DATADIRS))],
-                                 columns=["molid", "forcefield", "solvent", "interaction",
-                                          "lambda", "dihedral", "filename"])
-       datafiles = datafiles.sort_values(by=["molid", "forcefield", "dihedral", "solvent",
-                                             "interaction", "lambda"]).reset_index(drop=True)
+    See Also
+    --------
+    get_datafiles : function to collect a whole bunch of datafiles
 
     """
     # specific for our simulations
@@ -69,7 +62,43 @@ def get_metadata(filename):
             raise ValueError(f"{filename}: {value} not in {allowed})")
     return molid, forcefield, solvent, interaction, float(lmbda)/1000, dih, filename
 
+def get_datafiles(pattern, datadirs=None):
+    """Build DataFrame with data file paths and metadata.
 
+    Data files are collected from within the data directories.
+    The metadata are extracted from the filename itself.
+
+    Parameters
+    ----------
+    pattern : str
+       shell glob pattern for globbing, e.g., "*-ts.xvg*".
+    datadirs : list or None
+       list of directories to find datafiles under; should be
+       instances of :class:`pathlib.Path`. If ``None`` then
+       the current working directory is used.
+
+    Returns
+    -------
+    DataFrame
+       Sorted :class:`pandas.DataFrame` with
+       ``columns=["molid", "forcefield", "solvent", "interaction",
+       "lambda", "dihedral", "filename"]`` where `filename` is a
+       :class:`pathlib.Path`.
+
+    See Also
+    --------
+    get_metadata
+    """
+    if datadirs is None:
+        datadirs = [pathlib.Path.cwd()]
+
+    datafiles = pd.DataFrame([get_metadata(fn) for fn in
+                          itertools.chain(*(d.glob(pattern) for d in datadirs))],
+                          columns=["molid", "forcefield", "solvent", "interaction",
+                                   "lambda", "dihedral", "filename"])
+    datafiles = datafiles.sort_values(by=["molid", "forcefield", "dihedral", "solvent",
+                                          "interaction", "lambda"]).reset_index(drop=True)
+    return datafiles
 
 def periodic_angle(df, padding=45):
     """pad with ±padding beyond the edges and return angle series
