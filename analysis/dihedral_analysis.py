@@ -151,7 +151,7 @@ def extract(datafiles, start=None, stop=None, step=None, padding=45):
     for i in tqdm.tqdm(range(len(datafiles))):
         # get each row as a df for easier processing
         simulation = datafiles[i:i+1]
-        a = extract_single(simulation.iloc[0].filename, start=start, stop=stop ,stpe=step, padding=padding)
+        a = extract_single(simulation.iloc[0].filename, start=start, stop=stop, step=step, padding=padding)
         identifiers = simulation.drop(columns=["molid", "forcefield", "filename"])
         df = pd.concat(
                [pd.concat(len(a)*[identifiers], axis="index")
